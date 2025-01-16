@@ -66,7 +66,8 @@ function traverseParts(component, depthMultiplier) {
         }
 
         part.quantity = depthMultiplier.at(-1);
-        //console.log(depthMultiplier);
+        //console.log(part.quantity)
+        console.log(depthMultiplier);
         //console.log(traverseParts.tempDepthCounter);
 
         if (Object.keys(selectedComponent.parts).length === 0) {
