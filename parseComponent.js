@@ -69,7 +69,16 @@ function parseComponent(componentPath, outDir, compModelName) {
 	
 	try {
 		// read in sub-components
-		var componentsList = fs.readdirSync(componentPath + "/components/").sort();
+		
+		try {
+			var componentsList = fs.readdirSync(componentPath + "/components/").sort();	
+		} catch (error) {
+			console.log("Experienced error accessing folder: " + componentPath + "/components/")
+			throw new Error("Experienced error accessing folder: " + componentPath + "/components/")
+		}
+		
+		
+		
 		for (i in componentsList) {
 			var subComponent = parseComponent(componentPath + "/components/" + componentsList[i], outDir, compModelName);
 			component.components[subComponent.name] = subComponent;
@@ -82,7 +91,7 @@ function parseComponent(componentPath, outDir, compModelName) {
 		processComponentItems(component, component.tools);
 		
 		component.precautions = yaml.safeLoad(fs.readFileSync(componentPath + "/precautions.yaml", 'utf8'));
-		
+
 		component.assemblySteps = yaml.safeLoad(fs.readFileSync(componentPath + "/assemblySteps.yaml", 'utf8'));
 		
 		for (step in component.assemblySteps) {
@@ -92,6 +101,7 @@ function parseComponent(componentPath, outDir, compModelName) {
 									.parseAndRender(component.assemblySteps[s].summary, component)
 									.then(function(renderedSummary) {
 										component.assemblySteps[s].summary = renderedSummary;
+										// console.log(component.assemblySteps[s].summary) //ANL
 									}).catch(function(e) {
 										console.log(e);
 									}));
@@ -104,19 +114,65 @@ function parseComponent(componentPath, outDir, compModelName) {
 									}));
 			})(step);
 		}
-		
+
+		var precautionsArray = [];
+
+		for (precaution in component.precautions) {
+			(function(p) {
+				
+				liquidPromises.push(engine
+									.parseAndRender(component.precautions[p], component)
+									.then(function(renderedPrecautions) {
+										precautionsArray.push(renderedPrecautions);
+									}).catch(function(e) {
+										console.log(e);
+									}));
+			})(precaution);
+
+		}
+
+		component.precautions = precautionsArray;
+		 
 	} catch (e) {
 		console.log(e);
+		component.precautions = yaml.safeLoad(fs.readFileSync(componentPath + "/precautions.yaml", 'utf8'));
+		var precautionsArray = [];
+
+		for (precaution in component.precautions) {
+			(function(p) {
+				
+				liquidPromises.push(engine
+									.parseAndRender(component.precautions[p], component)
+									.then(function(renderedPrecautions) {
+										precautionsArray.push(renderedPrecautions);
+									}).catch(function(e) {
+										console.log(e);
+									}));
+			})(precaution);
+
+		}
+
+		component.precautions = precautionsArray;
+
 	}
 
-	Promise.all(liquidPromises)
+	seanandalexa = new Promise(resolve => setTimeout(resolve, 5000));
+
+	liquidPromises.push(seanandalexa);
+
+	Promise.allSettled(liquidPromises)
 		.then(function() {
 			var componentFileName = componentPath + '/' + outDir + '/' + compModelName;
-			fs.writeFileSync(componentFileName, yaml.safeDump(component));
-			console.log('Component Model ' + componentFileName + ' built');
-		}).catch(function(e) {
-			console.log(e);
-		});
+			try {
+				
+				fs.writeFileSync(componentFileName, yaml.safeDump(component));	
+				console.log('Component Model ' + componentFileName + ' built');
+
+			} catch (error) {
+				console.log("Experienced error accessing file: " + componentFileName);
+			}
+			
+				});
 	
 	return component;
 }

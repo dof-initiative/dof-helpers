@@ -1,0 +1,3 @@
+[submodule "packages/dof-lib-activity-step-view-overlay"]
+	path = packages/dof-lib-activity-step-view-overlay
+	url = git@github.com:AlexandriaLittle/dof-lib-activity-step-view-overlay.git

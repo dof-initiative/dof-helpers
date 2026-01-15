@@ -1,9 +1,14 @@
 = {{topComponent.description}} Assembly Instructions
-{{topComponent.author}}
+{{topComponent.author}} - {{topComponent.license}}
 :revnumber: v{{topComponent.version}}
 :revdate: {{generationDate}}
 :sectnums:
 :toc:
+:toclevels: 1
+:docinfo: shared
+// :docinfodir: dist/
+
+include::preamble.adoc[]
 
 // github specific things
 ifdef::env-github[]
@@ -19,6 +24,9 @@ endif::[]
 ifndef::env-github[]
 :imagesdir: ./images
 endif::[]
+
+include::flatPartsBOM.adoc[]
+include::flatToolsBOM.adoc[]
 
 {% for component in components %}
 == Assemble {{component.description}}
@@ -90,20 +98,20 @@ endif::[]
 {% endif %}
 
 // requiredTools
-{% if step.requiredTools.length > 0 %}
-*Required Tools*
-{% for tool in step.requiredTools %}
-* {{component.tools[tool].description}}
-{% endfor %}
-{% endif %}
+//{% if step.requiredTools.length > 0 %}
+//*Required Tools*
+//{% for tool in step.requiredTools %}
+//* {{component.tools[tool].description}}
+//{% endfor %}
+//{% endif %}
 
 // requiredParts
-{% if step.requiredParts.length > 0 %}
-*Required Parts*
-{% for part in step.requiredParts %}
-* {{component.parts[part].description}}
-{% endfor %}
-{% endif %}
+//{% if step.requiredParts.length > 0 %}
+//*Required Parts*
+//{% for part in step.requiredParts %}
+//* {{component.parts[part].description}}
+//{% endfor %}
+//{% endif %}
 
 // details
 {% if step.details.length > 0 %}

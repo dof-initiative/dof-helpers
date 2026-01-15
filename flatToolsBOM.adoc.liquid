@@ -1,0 +1,15 @@
+{%- if components -%}
+== Bill of Materials - Tools
+[cols="1,1,2,5"]
+|===
+|Quantity |Quantity Unit |Name |Description
+{% for component in components %}
+{% assign selectedIndex = component[1].selectedOption %}
+{% assign selectedOption = component[1].options[selectedIndex] %}
+|{{component[1].quantity}}
+|{{component[1].quantityUnits}}
+|{{component[1].name}}
+|{{component[1].description}}
+{% endfor %}
+|===
+{% endif %}
